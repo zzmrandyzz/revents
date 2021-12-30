@@ -1,5 +1,5 @@
 import React from "react";
-import { Route } from "react-router-dom";
+import { Route } from "react-router-dom/cjs/react-router-dom.min";
 import { Container } from "semantic-ui-react";
 import HomePage from "../../features/home/HomePage";
 import EventDashboard from "../../features/events/eventDashboard/EventDashboard";
@@ -7,14 +7,16 @@ import EventDetailedPage from "../../features/events/eventDetailed/EventDetailed
 import EventForm from "../../features/events/eventForm/EventForm";
 import NavBar from "../../features/nav/NavBar";
 import Sandbox from "../../features/sandbox/Sandbox";
-import { useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom/cjs/react-router-dom.min";
 import ModalManager from "../common/modals/ModalManager";
+import { ToastContainer } from "react-toastify";
 
 export default function App() {
   const { key } = useLocation();
   return (
     <>
       <ModalManager />
+      <ToastContainer position="bottom-right" hideProgressBar/>
       <Route exact path="/" component={HomePage} />
       <Route
         path="/(.+)"

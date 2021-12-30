@@ -1,3 +1,4 @@
+/* global google */
 import React from "react";
 import { Button, Header, Segment } from "semantic-ui-react";
 import cuid from "cuid";
@@ -11,6 +12,7 @@ import MyTextArea from "../../../app/common/form/MyTextArea";
 import MySelectInput from "../../../app/common/form/MySelectInput";
 import { categoryData } from "../../../app/api/categoryOptions";
 import MyDateInput from "../../../app/common/form/MyDateInput";
+import MyPlaceInput from "../../../app/common/form/MyPlaceInput";
 
 export default function EventForm({ match, history }) {
   const dispatch = useDispatch();
@@ -23,8 +25,14 @@ export default function EventForm({ match, history }) {
     title: "",
     category: "",
     description: "",
-    city: "",
-    venue: "",
+    city: {
+      address: "",
+      latLng: null,
+    },
+    venue: {
+      address: "",
+      latLng: null,
+    },
     date: "",
   };
 
@@ -32,8 +40,12 @@ export default function EventForm({ match, history }) {
     title: Yup.string().required("You must provide title"),
     category: Yup.string().required("You must provide category"),
     description: Yup.string().required("You must provide description"),
-    city: Yup.string().required(),
-    venue: Yup.string().required(),
+    city: Yup.object().shape({
+      address: Yup.string().required("City is required"),
+    }),
+    venue: Yup.object().shape({
+      address: Yup.string().required("Venue is required"),
+    }),
     date: Yup.string().required(),
   });
 
@@ -60,7 +72,7 @@ export default function EventForm({ match, history }) {
           history.push("/events");
         }}
       >
-        {({isSubmitting, dirty, isValid}) => (
+        {({ isSubmitting, dirty, values, isValid }) => (
           <Form className="ui form">
             <Header sub color="teal" content="Event Details" />
             <MyTextInput name="title" placeholder="Event title" />
@@ -71,8 +83,17 @@ export default function EventForm({ match, history }) {
             />
             <MyTextArea name="description" placeholder="Description" rows={3} />
             <Header sub color="teal" content="Event Location Details" />
-            <MyTextInput name="city" placeholder="Event city" />
-            <MyTextInput name="venue" placeholder="Event venue" />
+            <MyPlaceInput name="city" placeholder="Event city" />
+            <MyPlaceInput
+              name="venue"
+              disabled={!values.city.latLng}
+              placeholder="Event venue"
+              options={{
+                location: new google.maps.LatLng(values.city.latLng),
+                radius: 1000,
+                types: ["establishment"],
+              }}
+            />
             <MyDateInput
               name="date"
               placeholder="Event date"
@@ -94,7 +115,7 @@ export default function EventForm({ match, history }) {
               //   onClick={() => setFormOpen(false)}
               disabled={isSubmitting}
               as={Link}
-              to={"/event"}
+              to={`/events/${values.id}`}
               type="submit"
               floated="right"
               content="Cancel"
